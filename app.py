@@ -10,7 +10,7 @@ from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 app = Flask(__name__)
 
-config_file_path = r"C:\Users\KIIT\OneDrive\DATA SCIENCE\FLASK\File Uploader\config.json"
+config_file_path = 'config.json'
 with open(config_file_path, 'r') as f:
     config = json.load(f)
 
@@ -44,7 +44,7 @@ def handle_missing_values(df):
 def clean_data(filepath):
     df = pd.read_csv(filepath)
     df = handle_missing_values(df)
-    return df.sample(frac=0.5, random_state=42)  # Sample 50% of the data
+    return df.sample(frac=0.5, random_state=42)
 
 def generate_unique_filename(extension='png'):
     return os.path.join(app.config['STATIC_FOLDER'], f"{uuid.uuid4()}.{extension}")
@@ -133,33 +133,6 @@ def generate_text(prompt, max_length=150, temperature=0.7, top_k=50, top_p=0.95)
     )
     return gpt2_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-def generate_insights(pdf, param1, param2):
-    insights = []
-    if pdf[param1].dtype == 'object' and pdf[param2].dtype == 'object':
-        counts = pdf.groupby([param1, param2]).size().reset_index(name='counts')
-        for index, row in counts.iterrows():
-            insights.append(f"There are {row['counts']} instances where {param1} is {row[param1]} and {param2} is {row[param2]}.")
-    elif pdf[param1].dtype in ['int64', 'float64'] and pdf[param2].dtype in ['int64', 'float64']:
-        correlation = pdf[param1].corr(pdf[param2])
-        insights.append(f"The correlation between {param1} and {param2} is {correlation:.2f}.")
-    elif (pdf[param1].dtype == 'object' and pdf[param2].dtype in ['int64', 'float64']) or (pdf[param2].dtype == 'object' and pdf[param1].dtype in ['int64', 'float64']):
-        if pdf[param1].dtype == 'object':
-            group_means = pdf.groupby(param1)[param2].mean().reset_index()
-            for index, row in group_means.iterrows():
-                insights.append(f"The average {param2} for {param1} = {row[param1]} is {row[param2]:.2f}.")
-        else:
-            group_means = pdf.groupby(param2)[param1].mean().reset_index()
-            for index, row in group_means.iterrows():
-                insights.append(f"The average {param1} for {param2} = {row[param2]} is {row[param1]:.2f}.")
-    
-    # Generate explanations using GPT-2
-    detailed_insights = []
-    for insight in insights[:5]:  # Limit to 5 insights for clarity
-        explanation_prompt = f"Explain the following insight in detail: {insight}"
-        explanation = generate_text(explanation_prompt, max_length=150)
-        detailed_insights.append(f"{insight}\nExplanation: {explanation}")
-    
-    return detailed_insights
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -172,32 +145,24 @@ def upload_file():
     if file.filename == '':
         return redirect(request.url)
     if file and allowed_file(file.filename):
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(filepath)
-        return redirect(url_for('select_params', filename=file.filename))
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        cleaned_data = clean_data(file_path)
+        columns = cleaned_data.columns.tolist()
+        return render_template('select_params.html', filename=filename, columns=columns)
     return redirect(request.url)
 
-@app.route('/select_params/<filename>', methods=['GET'])
-def select_params(filename):
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    df = pd.read_csv(filepath)
-    columns = df.columns.tolist()
-    return render_template('select_params.html', columns=columns, filename=filename)
-
-@app.route('/generate', methods=['POST'])
+@app.route('/generate_graphs', methods=['POST'])
 def generate_graphs():
+    filename = request.form['filename']
     param1 = request.form['param1']
     param2 = request.form['param2']
-    filename = request.form['filename']
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    pdf = clean_data(filepath)
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    pdf = clean_data(file_path)
     graph_paths = generate_plot(pdf, param1, param2)
-    insights = generate_insights(pdf, param1, param2)
-    
-    if graph_paths:
-        graph_paths = [os.path.basename(graph_path) for graph_path in graph_paths]
-        return render_template('display_graph.html', graph_paths=graph_paths, insights=insights)
-    else:
-        return "No valid plots could be generated for the selected parameters."
+    prompt = f"Generate insights for the columns {param1} and {param2}."
+    insights = [generate_text(prompt)]
+    return render_template('display_graphs.html', graph_paths=graph_paths, insights=insights)
 
 app.run()
