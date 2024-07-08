@@ -1,6 +1,3 @@
-Sure! Here's an updated version of the project description including the instructions for uploading the file, selecting parameters, and generating insights using GPT-2 on the website:
-
----
 
 ### Knowledge Representation and Insight Generation from Structured Datasets
 
