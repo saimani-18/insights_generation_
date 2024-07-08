@@ -1,7 +1,8 @@
+Sure! Here's an updated version of the project description including the instructions for uploading the file, selecting parameters, and generating insights using GPT-2 on the website:
+
+---
 
 ### Knowledge Representation and Insight Generation from Structured Datasets
-
-
 
 Project Description
 This project aims to develop an AI-based solution to process, analyze, and extract meaningful insights from the [Adult Income Dataset](https://archive.ics.uci.edu/dataset/2/adult). The key objectives are to preprocess the data, represent the knowledge effectively, and identify patterns to support decision-making processes.
@@ -55,7 +56,7 @@ Generate insights from the structured data by analyzing model performance and fe
 
 ---
 
-### How to Run the Project
+### Running the Project
 
 1. Install required libraries:
    ```bash
@@ -65,6 +66,16 @@ Generate insights from the structured data by analyzing model performance and fe
 
 ---
 
+### Using the Website
+
+1. **Upload the File:** Upload the dataset file to the website.
+2. **Select Parameters:** Choose two parameters from the dataset for generating graphical representations and insights.
+3. **Insights Generation:** For generating Insights(Text)  GPT2 is used.
+
+---
+
 ### Conclusion
 
 This project showcases the use of various machine learning models and big data tools to extract insights from structured datasets, supporting data-driven decision-making processes.
+
+---
