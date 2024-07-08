@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Parameters</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:700,300');
+
+        html {
+            background-image: url('https://images.unsplash.com/photo-1581898975010-1446955616ba?crop=entropy&cs=srgb&fm=jpg&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTk1OTU1MjV8&ixlib=rb-4.0.3&q=85');
+            background-size: cover;
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Open Sans", Helvetica, sans-serif;
+        }
+
+        .frame {
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 4px 8px 16px 0 rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to top right, #071952 0%, #088395 100%);
+            color: #fff;
+            text-align: center;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+
+        h4 {
+            margin-bottom: 20px;
+        }
+
+        .center {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .center div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            display: block;
+            width: 160px;
+            padding: 10px;
+            background: #088395;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+
+        .btn:hover {
+            background: #065a7c;
+        }
+
+        .loading-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #ff6b6b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </div>
+    <div class="frame">
+        <h4>Select Parameters for Graph Generation</h4>
+        <div class="center">
+            <form action="{{ url_for('generate_graphs') }}" method="post" id="parameterForm">
+                <input type="hidden" name="filename" value="{{ filename }}">
+                <div>
+                    <label for="param1">Parameter 1:</label>
+                    <select name="param1" id="param1">
+                        {% for column in columns %}
+                            <option value="{{ column }}">{{ column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="param2">Parameter 2:</label>
+                    <select name="param2" id="param2">
+                        {% for column in columns %}
+                            <option value="{{ column }}">{{ column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn">Generate Graphs</button>
+            </form>
+            <div class="loading-message" id="loadingMessage">Generating graphs, please wait...</div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('parameterForm').addEventListener('submit', function(event) {
+            document.getElementById('loadingMessage').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Representation and Insight Generation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </div>
+    <div class="frame">
+        <h4>Knowledge Representation and Insight Generation</h4>
+        <div class="center">
+            <div class="title">
+                <h1>Drop file to upload</h1>
+            </div>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="dropzone" style="margin-left: 150px;">
+                    <img src="http://100dayscss.com/codepen/upload.svg" class="upload-icon" />
+                    <input type="file" name="file" class="upload-input" id="fileInput" />
+                </div>
+                <div id="fileName" class="file-name">No file selected</div>
+                <button type="button" class="btn" id="uploadButton">Upload file</button>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
