@@ -1,5 +1,5 @@
 {
-    "UPLOAD_FOLDER": "C:\\Users\\KIIT\\OneDrive\\DATA SCIENCE\\FLASK\\File Uploader\\uploads",
-    "STATIC_FOLDER": "C:\\Users\\KIIT\\OneDrive\\DATA SCIENCE\\FLASK\\File Uploader\\static",
+    "UPLOAD_FOLDER": "uploads",
+    "STATIC_FOLDER": "static",
     "ALLOWED_EXTENSIONS": ["csv"]
 }
