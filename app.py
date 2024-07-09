@@ -9,22 +9,22 @@ import json
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import torch
 
-
 app = Flask(__name__)
 
-config_file_path = r"C:\Users\KIIT\OneDrive\DATA SCIENCE\FLASK\File Uploader\config.json"
-with open(config_file_path, 'r') as f:
+# Load configuration from config.json
+with open('config.json', 'r') as f:
     config = json.load(f)
 
+# Set up directories
 app.config['UPLOAD_FOLDER'] = config['UPLOAD_FOLDER']
 app.config['STATIC_FOLDER'] = config['STATIC_FOLDER']
 app.config['ALLOWED_EXTENSIONS'] = set(config['ALLOWED_EXTENSIONS'])
 
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
-if not os.path.exists(app.config['STATIC_FOLDER']):
-    os.makedirs(app.config['STATIC_FOLDER'])
+# Create directories if they don't exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['STATIC_FOLDER'], exist_ok=True)
 
+# Load GPT-2 model and tokenizer
 gpt2_tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
 
@@ -162,6 +162,7 @@ def generate_insights(pdf, param1, param2):
         detailed_insights.append(f"{insight}\nExplanation: {explanation}")
     
     return detailed_insights
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -202,4 +203,6 @@ def generate_graphs():
     else:
         return "No valid plots could be generated for the selected parameters."
 
-app.run()
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
