@@ -8,9 +8,14 @@ import uuid
 import json
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import torch
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 
+# Load config.json
 config_file_path = os.path.join(os.path.dirname(__file__), 'config.json')
 with open(config_file_path, 'r') as f:
     config = json.load(f)
@@ -36,10 +41,10 @@ def handle_missing_values(df):
     for column in df.columns:
         if df[column].dtype in ['int64', 'float64']:
             mean_value = df[column].mean()
-            df[column].fillna(mean_value, inplace=True)
+            df.loc[:, column] = df[column].fillna(mean_value)
         else:
             mode_value = df[column].mode()[0]
-            df[column].fillna(mode_value, inplace=True)
+            df.loc[:, column] = df[column].fillna(mode_value)
     return df
 
 def clean_data(filepath):
@@ -51,6 +56,7 @@ def generate_unique_filename(extension='png'):
     return os.path.join(app.config['STATIC_FOLDER'], f"{uuid.uuid4()}.{extension}")
 
 def generate_bar_plot(pdf, param1, param2):
+    plt.switch_backend('Agg')
     plt.figure(figsize=(9, 6))
     sns.countplot(data=pdf, x=param1, hue=param2)
     plt.title(f'Count plot of {param1} vs {param2}')
@@ -60,6 +66,7 @@ def generate_bar_plot(pdf, param1, param2):
     return graph_path
 
 def generate_pie_plot(pdf, param1):
+    plt.switch_backend('Agg')
     plt.figure(figsize=(9,6))
     pdf[param1].value_counts().plot.pie(autopct='%1.1f%%', shadow=True)
     plt.title(f'Pie plot of {param1}')
@@ -69,6 +76,7 @@ def generate_pie_plot(pdf, param1):
     return graph_path
 
 def generate_line_plot(pdf, param1, param2):
+    plt.switch_backend('Agg')
     plt.figure(figsize=(9, 6))
     sns.lineplot(data=pdf, x=param1, y=param2)
     plt.title(f'Line plot of {param1} vs {param2}')
@@ -78,6 +86,7 @@ def generate_line_plot(pdf, param1, param2):
     return graph_path
 
 def generate_scatter_plot(pdf, param1, param2):
+    plt.switch_backend('Agg')
     plt.figure(figsize=(9, 6))
     sns.scatterplot(data=pdf, x=param1, y=param2)
     plt.title(f'Scatter plot of {param1} vs {param2}')
@@ -87,6 +96,7 @@ def generate_scatter_plot(pdf, param1, param2):
     return graph_path
 
 def generate_box_plot(pdf, param1, param2):
+    plt.switch_backend('Agg')
     plt.figure(figsize=(9, 6))
     sns.boxplot(data=pdf, x=param1, y=param2)
     plt.title(f'Box plot of {param1} vs {param2}')
@@ -96,6 +106,7 @@ def generate_box_plot(pdf, param1, param2):
     return graph_path
 
 def generate_violin_plot(pdf, param1, param2):
+    plt.switch_backend('Agg')
     plt.figure(figsize=(9, 6))
     sns.violinplot(data=pdf, x=param1, y=param2)
     plt.title(f'Violin plot of {param1} vs {param2}')
@@ -130,7 +141,8 @@ def generate_text(prompt, max_length=150, temperature=0.7, top_k=50, top_p=0.95)
         pad_token_id=gpt2_tokenizer.eos_token_id,
         temperature=temperature,
         top_k=top_k,
-        top_p=top_p
+        top_p=top_p,
+        do_sample=True
     )
     return gpt2_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
