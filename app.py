@@ -11,20 +11,19 @@ import torch
 
 app = Flask(__name__)
 
-# Load configuration from config.json
-with open('config.json', 'r') as f:
+config_file_path = os.path.join(os.path.dirname(__file__), 'config.json')
+with open(config_file_path, 'r') as f:
     config = json.load(f)
 
-# Set up directories
-app.config['UPLOAD_FOLDER'] = config['UPLOAD_FOLDER']
-app.config['STATIC_FOLDER'] = config['STATIC_FOLDER']
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), config['UPLOAD_FOLDER'])
+app.config['STATIC_FOLDER'] = os.path.join(os.path.dirname(__file__), config['STATIC_FOLDER'])
 app.config['ALLOWED_EXTENSIONS'] = set(config['ALLOWED_EXTENSIONS'])
 
-# Create directories if they don't exist
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['STATIC_FOLDER'], exist_ok=True)
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+if not os.path.exists(app.config['STATIC_FOLDER']):
+    os.makedirs(app.config['STATIC_FOLDER'])
 
-# Load GPT-2 model and tokenizer
 gpt2_tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
 
@@ -199,10 +198,9 @@ def generate_graphs():
     
     if graph_paths:
         graph_paths = [os.path.basename(graph_path) for graph_path in graph_paths]
-        return render_template('display_graph.html', graph_paths=graph_paths, insights=insights)
+        return render_template('display_graphs.html', graph_paths=graph_paths, insights=insights)
     else:
         return "No valid plots could be generated for the selected parameters."
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run()
