@@ -3,3 +3,4 @@
     "STATIC_FOLDER": "static",
     "ALLOWED_EXTENSIONS": ["csv"]
 }
+
