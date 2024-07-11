@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generated Graph</title>
+    <title>Generated Graphs</title>
     <style>
         html, body {
             height: 100%;
@@ -36,19 +36,42 @@
             justify-content: center;
             align-items: center;
             margin: 20px 10px;
-            flex-wrap: wrap; 
+            flex-wrap: wrap;
             width: 100%;
         }
-        .graph-container img {
+        .graph-item {
+            position: relative;
             max-width: 45%;
-            height: auto;
-            margin: 10px; 
+            margin: 10px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease;
         }
-        .graph-container img:hover {
+        .graph-item:hover {
             transform: scale(1.05);
+        }
+        .graph-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .download-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .download-button:hover {
+            background-color: #45a049;
         }
         .insights-container {
             width: 90%;
@@ -74,7 +97,12 @@
     <div class="title">Generated Graphs</div>
     <div class="graph-container">
         {% for graph_path in graph_paths %}
-            <img src="{{ url_for('static', filename=graph_path) }}" alt="Graph">
+            <div class="graph-item">
+                <img src="{{ url_for('static', filename=graph_path) }}" alt="Graph">
+                <a href="{{ url_for('static', filename=graph_path) }}" download>
+                    <button class="download-button">Download</button>
+                </a>
+            </div>
         {% endfor %}
     </div>
     <div class="insights-container">

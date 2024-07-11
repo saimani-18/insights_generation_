@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, send_file
 import numpy as np
 import os
 import pandas as pd
@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import uuid
 import json
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
-import torch
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -28,9 +26,6 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 if not os.path.exists(app.config['STATIC_FOLDER']):
     os.makedirs(app.config['STATIC_FOLDER'])
-
-gpt2_tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
@@ -132,20 +127,6 @@ def generate_plot(pdf, param1, param2):
             graph_paths.append(generate_violin_plot(pdf, param2, param1))
     return graph_paths
 
-def generate_text(prompt, max_length=150, temperature=0.7, top_k=50, top_p=0.95):
-    inputs = gpt2_tokenizer.encode(prompt, return_tensors='pt')
-    outputs = gpt2_model.generate(
-        inputs, 
-        max_length=max_length, 
-        num_return_sequences=1, 
-        pad_token_id=gpt2_tokenizer.eos_token_id,
-        temperature=temperature,
-        top_k=top_k,
-        top_p=top_p,
-        do_sample=True
-    )
-    return gpt2_tokenizer.decode(outputs[0], skip_special_tokens=True)
-
 def generate_insights(pdf, param1, param2):
     insights = []
     if pdf[param1].dtype == 'object' and pdf[param2].dtype == 'object':
@@ -164,15 +145,7 @@ def generate_insights(pdf, param1, param2):
             group_means = pdf.groupby(param2)[param1].mean().reset_index()
             for index, row in group_means.iterrows():
                 insights.append(f"The average {param1} for {param2} = {row[param2]} is {row[param1]:.2f}.")
-    
-    # Generate explanations using GPT-2
-    detailed_insights = []
-    for insight in insights[:5]:  # Limit to 5 insights for clarity
-        explanation_prompt = f"Explain the following insight in detail: {insight}"
-        explanation = generate_text(explanation_prompt, max_length=150)
-        detailed_insights.append(f"{insight}\nExplanation: {explanation}")
-    
-    return detailed_insights
+    return insights
 
 @app.route('/')
 def index():
@@ -214,5 +187,13 @@ def generate_graphs():
     else:
         return "No valid plots could be generated for the selected parameters."
 
+@app.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
+    file_path = os.path.join(app.config['STATIC_FOLDER'], filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    else:
+        return "File not found.", 404
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
