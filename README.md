@@ -63,10 +63,13 @@ Generate insights from the structured data by analyzing model performance and fe
 2. Execute the Jupyter Notebook to preprocess the data, train models, and generate insights.
 
 ---
-###Using the Website
-**Upload the File:** Upload the preprocessed dataset file to the website.
-**Select Parameters:** Choose two parameters from the dataset for generating graphical representations and insights.
-**Generate Insights:** Utilize GPT-2 to analyze the selected parameters and provide meaningful insights based on the model's performance and feature importance.
+### Using the Website
+
+1.**Upload the File:** Upload the preprocessed dataset file to the website.
+
+2.**Select Parameters:** Choose two parameters from the dataset for generating graphical representations and insights.
+
+3.**Generate Insights:** Utilize GPT-2 to analyze the selected parameters and provide meaningful insights based on the model's performance and feature importance.
 
 ---
 ### Conclusion
