@@ -180,7 +180,6 @@ def generate_graphs():
     pdf = clean_data(filepath)
     graph_paths = generate_plot(pdf, param1, param2)
     insights = generate_insights(pdf, param1, param2)
-    
     if graph_paths:
         graph_paths = [os.path.basename(graph_path) for graph_path in graph_paths]
         return render_template('display_graphs.html', graph_paths=graph_paths, insights=insights)
